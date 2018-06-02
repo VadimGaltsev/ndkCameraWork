@@ -14,11 +14,9 @@ public class CameraViewClass {
     public static final String _IMAGE_B = "imageB";
     public static final String _TEXTURE_V = "textureV";
 
-    private AppCompatActivity _Context;
     private ViewGroup _ViewLayout;
 
     public CameraViewClass(AppCompatActivity _Context) {
-        this._Context = _Context;
         initView(_Context);
     }
 
