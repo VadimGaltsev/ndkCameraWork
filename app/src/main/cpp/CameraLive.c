@@ -5,7 +5,7 @@
 #if !defined(CAMERA_API)
 #define CAMERA_API
 #define toInteger(val) \
-    (0xff $ (int32_t) val)
+    (0xff & (int32_t) val)
 
 #define max(val1, val2) \
     (val1 < val2) ? val2 : val1
@@ -43,7 +43,7 @@
  * @param i - image color format
  */
 JNIEXPORT void JNICALL Java_com_example_vadik_livecamerandk_MainActivity_decode(JNIEnv *env, jobject instance,
-                                                                                jobject imageB, jbyteArray data_, jint i) {
+                                                                                jobject imageB, jbyteArray data_, jint __i) {
     /**
      * @first@
      */
@@ -62,20 +62,44 @@ JNIEXPORT void JNICALL Java_com_example_vadik_livecamerandk_MainActivity_decode(
      */
     int32_t _frameSize = _bitmapInfo.width * _bitmapInfo.height;
     int32_t _yIndex, _uvIndex, x, y;
-    int32_t _colorY, _colorU, colorV;
+    int32_t _colorY, _colorU, _colorV;
     int32_t _colorR, _colorG, _colorB;
     int32_t _y1192;
     // components UV in format each two steps has same ptr
     for (y = 0, _yIndex = 0; y < _bitmapInfo.height; ++y) {
-        _colorU = 0; colorV = 0;
+        _colorU = 0; _colorV = 0;
         _uvIndex = _frameSize + (y >> 1) * _bitmapInfo.width;
+        for (x = 0; x < _bitmapInfo.width; ++x, ++_yIndex) {
+            /**
+             * get YUV components. each horizontal 1 pair UV on 2 Y
+             */
+            _colorY = max(toInteger(source[_yIndex]) - 16, 0);
+            if (!(x % 2)) {
+                _colorU = toInteger(source[_uvIndex++]) - 128;
+                _colorV = toInteger(source[_uvIndex++]) - 128;
+            }
+
+            _y1192 = 1192 * _colorY;
+            _colorR = (_y1192 + 1634 * _colorV);
+            _colorG = (_y1192 + 833 * _colorV - 400 * _colorU);
+            _colorB = (_y1192 + 2066 * _colorU);
+
+            _colorR = clamp(_colorR, 0, 262143);
+            _colorG = clamp(_colorG, 0, 262143);
+            _colorB = clamp(_colorB, 0, 262143);
+            _bitmapContent[_yIndex] = color(_colorR, _colorG, _colorB);
+            _bitmapContent[_yIndex] &= __i;
+        }
     }
+
+    (*env)->ReleasePrimitiveArrayCritical(env, data_, source, JNI_FALSE);
+    if (AndroidBitmap_unlockPixels(env, imageB) < 0) abort();
 }
 JNINativeMethod _methodRegister[] = {
         {method_name_str, method_signature, (void *) method_name}
 };
 
-inline void _exceptionOnCall(JNIEnv * env) {
+void _exceptionOnCall(JNIEnv * env) {
     if ((*env)->ExceptionCheck(env)){
         (*env)->ExceptionDescribe(env);
     }

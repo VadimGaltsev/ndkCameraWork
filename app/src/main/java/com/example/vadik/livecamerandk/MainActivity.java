@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
             decode(_ImageG, data, 0xFF00FF00);
             decode(_ImageB, data, 0XFF0000FF);
             _ImageVR.invalidate();
-            _ImageVB.invalidate();
             _ImageVG.invalidate();
+            _ImageVB.invalidate();
             _Camera.addCallbackBuffer(_View_Source);
         }
     }

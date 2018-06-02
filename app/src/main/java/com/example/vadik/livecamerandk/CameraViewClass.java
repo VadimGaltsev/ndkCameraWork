@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 public class CameraViewClass {
     public static final String _IMAGE_R = "imageR";
-    public static final String _IMAGE_G = "imageR";
-    public static final String _IMAGE_B = "imageR";
+    public static final String _IMAGE_G = "imageG";
+    public static final String _IMAGE_B = "imageB";
     public static final String _TEXTURE_V = "textureV";
 
     private AppCompatActivity _Context;
@@ -57,6 +57,7 @@ public class CameraViewClass {
     private TextureView createTextureView(AppCompatActivity context, String _tag) {
         TextureView _TeView = new TextureView(context);
         _TeView.setLayoutParams(generateLayoutParams());
+        _TeView.setTag(_tag);
         ((LinearLayout.LayoutParams)_TeView.getLayoutParams()).weight = 1;
         return _TeView;
     }
@@ -64,7 +65,8 @@ public class CameraViewClass {
     private ImageView createImageView(AppCompatActivity context, String _tag) {
         ImageView _TeView = new ImageView(context);
         _TeView.setLayoutParams(generateLayoutParams());
-        _TeView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.ic_launcher_background));
+        _TeView.setTag(_tag);
+        _TeView.setBackgroundDrawable(context.getResources().getDrawable(android.R.drawable.bottom_bar));
         ((LinearLayout.LayoutParams)_TeView.getLayoutParams()).weight = 1;
         return _TeView;
     }
